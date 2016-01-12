@@ -1,6 +1,6 @@
 var Consumer = require('sqs-consumer');
 var AWS      = require('aws-sdk');
-var config   = require('../aws.json');
+var config   = require('../../aws.json');
 var Client   = require('ftp');
 var moment   = require('moment');
 var path     = require('path');
