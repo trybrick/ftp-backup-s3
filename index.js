@@ -41,18 +41,17 @@ function downloadFile(myConfig, myMessage, callback) {
 		var s3FileName = path.basename(fileName);
 		var dirName = path.dirname(fileName);
 		console.log('downloading: ' + s3FileName);
-        client.get(fileName, function(err, stream) {
-            if (err) {
-            	callback(err);
-            	throw err;
-            }
+    client.get(fileName, function(err, stream) {
+      if (err) {
+      	callback(err);
+      	throw err;
+      }
 
-      		stream.once('close', function() { client.end(); });
+  	  stream.once('close', function() { client.end(); });
 
-
-			var today = moment(new Date());
-		    var s3Key = 'archive/' + today.format('YYYYMMDD/');
-		    s3Key += myMessage.pathParams.clientid + '/' + s3FileName;
+			var today = moment(myMessage.queryParams.at);
+		  var s3Key = 'archive/' + today.format('YYYYMMDD/');
+		  s3Key += myMessage.pathParams.clientid + '/' + s3FileName;
 
 			console.log('uploading: ' + s3Key);
 			var s3obj = new AWS.S3({params: {Bucket: myConfig.Bucket, Key: s3Key} });
