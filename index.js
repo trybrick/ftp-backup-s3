@@ -21,7 +21,7 @@ config.messageCount = 0;
 var isClientId = /\d+/gi;
 
 /* Message Example */
-var msg = {
+var sampleMsg = {
   "queryParams": {
     "action": "create",
     "at": "2016-01-06T11:08:20 00:00",
@@ -145,5 +145,5 @@ function handleIdle() {
 setTimeout(handleIdle, 999);
 app.start();
 
-
-//downloadFile(config, msg, function() {});
+// test download
+// downloadFile(config, sampleMsg, function() {});
