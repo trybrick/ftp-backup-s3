@@ -6,6 +6,7 @@ var moment   = require('moment');
 var path     = require('path');
 var fs       = require('fs');
 var FTP      = require('ftp');
+var stream   = require('stream');
 
 AWS.config.update({
   region: config.Region,
@@ -19,14 +20,14 @@ config.messageCount = 0;
 
 var isClientId = /\d+/gi;
 
-/* Message Example 
+/* Message Example */
 var msg = {
   "queryParams": {
     "action": "create",
     "at": "2016-01-06T11:08:20 00:00",
-    "destination": "FTPRoot/Roundys/Marianos/data/MFM_20160107_DIF.ZIP",
+    "destination": "FTPRoot/Roundys/Marianos/data/MARIANOS_20151108_HIF.ZIP",
     "interface": "ftp",
-    "path": "FTPRoot/Roundys/Marianos/data/MFM_20160107_DIF.ZIP",
+    "path": "FTPRoot/Roundys/Marianos/data/MARIANOS_20151108_HIF.ZIP",
     "type": "file",
     "username": "blahblah"
   },
@@ -34,43 +35,51 @@ var msg = {
     "clientid": "218"
   }
 }
-*/
+
 
 function downloadFile(myConfig, myMessage, callback) {
 	var client = new FTP();
-	var fileName = myMessage.queryParams.path.replace('FTPRoot/', '/');
+	var fileName = myMessage.queryParams.path.replace('FTPRoot/', '');
 	console.log('message: ' + JSON.stringify(myMessage, null, 4));
 	client.on('ready', function() {
-		var s3FileName = path.basename(fileName);
+
+    var s3FileName = fileName;
+    var rootIdx = fileName.indexOf('/');
+    if (rootIdx > 0) {
+      s3FileName = fileName.substring(rootIdx + 1);
+    }
+
 		var dirName = path.dirname(fileName);
 		console.log('downloading: ' + s3FileName);
-    client.get(fileName, function(err, stream) {
+    client.get(fileName, function(err, data) {
       if (err) {
       	callback(err);
       	throw err;
       }
 
-  	  stream.once('close', function() { client.end(); });
+  	  // data.once('close', function() { client.end(); });
 
-			var today = moment(myMessage.queryParams.at);
+			var today = moment(Date.parse(myMessage.queryParams.at.substring(0,10)));
       var folderPrefix = 'archive/';
 
-      if (isClientId.test(myMessage.pathParams.clientid + '')) {
+      if (!isClientId.test(myMessage.pathParams.clientid + '')) {
         folderPrefix = myMessage.pathParams.clientid + '/';
       }
 
-
+      var passThrough = new stream.PassThrough();
+      var s3ref = data.pipe(passThrough);
       var s3Key = folderPrefix + today.format('YYYYMMDD/');
       s3Key += myMessage.pathParams.clientid + '/' + s3FileName;
 
 			console.log('uploading: ' + s3Key);
 			var s3obj = new AWS.S3({params: {Bucket: myConfig.Bucket, Key: s3Key} });
-			s3obj.upload({Body: stream})
-				.on('httpUploadProgress', function(evt) {
-			    	console.log('Progress:', evt.loaded, '/', evt.total); 
-			  	})
+			s3obj.upload({Body: s3ref})
+				/*.on('httpUploadProgress', function(evt) {
+			    	console.log('Progress:', evt); 
+			  	}) */
 			  	.send(function(err, data) { 
 				  	console.log(err ? 'error: ' + err : 'data: ', data);
+            client.end();
 				  	callback(err);
 				});
 		});
@@ -136,3 +145,5 @@ function handleIdle() {
 setTimeout(handleIdle, 999);
 app.start();
 
+
+//downloadFile(config, msg, function() {});
