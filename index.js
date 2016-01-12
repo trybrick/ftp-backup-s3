@@ -51,7 +51,7 @@ function downloadFile(myConfig, myMessage, callback) {
 
 		var dirName = path.dirname(fileName);
 		console.log('downloading: ' + s3FileName);
-    client.get(fileName, function(err, data) {
+    client.get('/' + fileName, function(err, data) {
       if (err) {
       	callback(err);
       	throw err;
