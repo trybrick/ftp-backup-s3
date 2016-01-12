@@ -39,7 +39,8 @@ var sampleMsg = {
 
 function downloadFile(myConfig, myMessage, callback) {
 	var client = new FTP();
-	var fileName = myMessage.queryParams.destination.replace('FTPRoot/', '');
+  var parms = myMessage.queryParams;
+	var fileName = (parms.destination || parms.path).replace('FTPRoot/', '');
 	console.log('message: ' + JSON.stringify(myMessage, null, 4));
 	client.on('ready', function() {
 
