@@ -61,15 +61,16 @@ function downloadFile(myConfig, myMessage, callback) {
 
 			var today = moment(Date.parse(myMessage.queryParams.at.substring(0,10)));
       var folderPrefix = 'archive/';
+      var myClientId = (myMessage.pathParams.clientid + '').replace(/\s+/gi, '');
 
-      if (!isClientId.test(myMessage.pathParams.clientid + '')) {
-        folderPrefix = myMessage.pathParams.clientid + '/';
+      if (!isClientId.test(myClientId)) {
+        folderPrefix = myClientId + '/';
       }
 
       var passThrough = new stream.PassThrough();
       var s3ref = data.pipe(passThrough);
       var s3Key = folderPrefix + today.format('YYYYMMDD/');
-      s3Key += myMessage.pathParams.clientid + '/' + s3FileName;
+      s3Key += myClientId + '/' + s3FileName;
 
 			console.log('uploading: ' + s3Key);
 			var s3obj = new AWS.S3({params: {Bucket: myConfig.Bucket, Key: s3Key} });
