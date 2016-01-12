@@ -15,6 +15,7 @@ AWS.config.update({
 
 config.startTime = new Date();
 config.isRunning = false;
+config.messageCount = 0;
 
 /* Message Example 
 var msg = {
@@ -111,9 +112,10 @@ function handleIdle() {
 
 	if (!config.isRunning && diffMs > idleLimit)
 	{
+    config.messageCount++;
 		console.log('idle timeout...' )
 		app.stop();
-		process.exit();
+		process.exit(config.messageCount > 0 ? 0 : 1);
 		return;
 	}
 	
