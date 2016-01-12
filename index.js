@@ -17,6 +17,8 @@ config.startTime = new Date();
 config.isRunning = false;
 config.messageCount = 0;
 
+var isClientId = /\d+/gi;
+
 /* Message Example 
 var msg = {
   "queryParams": {
@@ -51,8 +53,15 @@ function downloadFile(myConfig, myMessage, callback) {
   	  stream.once('close', function() { client.end(); });
 
 			var today = moment(myMessage.queryParams.at);
-		  var s3Key = 'archive/' + today.format('YYYYMMDD/');
-		  s3Key += myMessage.pathParams.clientid + '/' + s3FileName;
+      var folderPrefix = 'archive/';
+
+      if (isClientId.test(myMessage.pathParams.clientid + '')) {
+        folderPrefix = myMessage.pathParams.clientid + '/';
+      }
+
+
+      var s3Key = folderPrefix + today.format('YYYYMMDD/');
+      s3Key += myMessage.pathParams.clientid + '/' + s3FileName;
 
 			console.log('uploading: ' + s3Key);
 			var s3obj = new AWS.S3({params: {Bucket: myConfig.Bucket, Key: s3Key} });
@@ -85,6 +94,7 @@ var app = Consumer.create({
   	var validActions = ['create', 'update', 'move','copy'];
 
   	if (validActions.indexOf(msg.queryParams.action) > -1) {
+      config.messageCount++;
   		console.log(message);
   		downloadFile(config, msg, done);
   		return;
@@ -112,7 +122,6 @@ function handleIdle() {
 
 	if (!config.isRunning && diffMs > idleLimit)
 	{
-    config.messageCount++;
 		console.log('idle timeout...' )
 		app.stop();
 		process.exit(config.messageCount > 0 ? 0 : 1);
