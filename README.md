@@ -1,2 +1,2 @@
-# ftp-backup-s3
-ftp backup to s3
+# azure-pos
+Import point of sale csv to Azure.

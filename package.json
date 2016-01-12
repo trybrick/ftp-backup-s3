@@ -1,0 +1,14 @@
+{
+  "name": "ftp-backup-s3",
+  "description": "Backup to s3 job",
+  "version": "1.0.0",
+  "dependencies": {
+    "sqs-consumer": "*",
+    "aws-sdk": "*",
+    "moment": "*",
+    "ftp": "*"
+  },
+  "devDependencies": {
+    "gulp-nop": "0.0.3"
+  }
+}
