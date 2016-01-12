@@ -39,7 +39,7 @@ var sampleMsg = {
 
 function downloadFile(myConfig, myMessage, callback) {
 	var client = new FTP();
-	var fileName = myMessage.queryParams.path.replace('FTPRoot/', '');
+	var fileName = myMessage.queryParams.destination.replace('FTPRoot/', '');
 	console.log('message: ' + JSON.stringify(myMessage, null, 4));
 	client.on('ready', function() {
 
@@ -100,7 +100,7 @@ var app = Consumer.create({
   	config.lastActionTime = new Date();
   	config.isRunning = true;
   	var msg = JSON.parse(message.Body);
-  	var validActions = ['create', 'update', 'move','copy'];
+  	var validActions = ['create', 'update'];
 
   	if (validActions.indexOf(msg.queryParams.action) > -1) {
       config.messageCount++;
