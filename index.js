@@ -60,7 +60,7 @@ function downloadFile(myConfig, myMessage, callback) {
 
   	  // data.once('close', function() { client.end(); });
 
-			var today = moment(Date.parse(myMessage.queryParams.at.substring(0,10)));
+			var today = moment(Date.parse(parms.at.substring(0,10)));
       var folderPrefix = 'archive/';
       var myClientId = (myMessage.pathParams.clientid + '').replace(/\s+/gi, '');
 
