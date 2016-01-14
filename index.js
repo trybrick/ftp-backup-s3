@@ -20,7 +20,6 @@ AWS.config.update({
 config.startTime = new Date();
 config.isRunning = false;
 config.messageCount = 0;
-config.maxdate = new Date(-8640000000000000);
 
 function downloadFile(myConfig, myMessage, callback) {
 	var client = new FTP();
@@ -48,7 +47,7 @@ function downloadFile(myConfig, myMessage, callback) {
             client.end();
 				  	console.log(err ? 'error: ' + err : 'data: ', data);
             if (!err) {
-              var sortKey = config.maxdate.getTime() - (new Date()).getTime();
+              var sortKey = 8640000000000000 - (new Date()).getTime();
               var rk = sortKey + '::' + myMessage.
                 target.ftp.
                 replace(/\/+/gi, '_').
