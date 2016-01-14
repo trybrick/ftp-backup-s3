@@ -9,6 +9,7 @@ var FTP      = require('ftp');
 var stream   = require('stream');
 var azStorageSimple = require('azure-storage-simple');
 var azStorage = azStorageSimple(config.AzureAccount, config.AzureKey);
+var tbl = azStorage.table('brickftplog');
 
 AWS.config.update({
   region: config.Region,
@@ -52,7 +53,7 @@ function downloadFile(myConfig, myMessage, callback) {
                 replace(/\/+/gi, '_').
                 replace(/\W+/gi, '-');
               try {
-                var tbl = azStorage.table('brickftplog');
+                console.log(JSON.stringify(tbl, null, 4));
                 await tbl.write(myMessage.pathParams.clientid, rk, myMessage);
               } catch(e) {
                 console.log('azure err: ' + e);
