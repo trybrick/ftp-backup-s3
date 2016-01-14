@@ -7,7 +7,8 @@
     "aws-sdk": "*",
     "moment": "*",
     "ftp": "*",
-    "azure-storage-simple": "*"
+    "azure-storage-simple": "*",
+    "Buffer": "*"
   },
   "devDependencies": {
     "gulp-nop": "0.0.3"
