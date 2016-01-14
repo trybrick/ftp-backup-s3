@@ -28,6 +28,7 @@ function downloadFile(myConfig, myMessage, callback) {
 
   client.on('error', function(err) {
     console.log('ftp error: ' + JSON.stringify(err, null, 4));
+
     if (err.code == 550) {
       callback();
     }
@@ -37,6 +38,8 @@ function downloadFile(myConfig, myMessage, callback) {
   });
 
 	client.on('ready', function() {
+    console.log('getting file: ' + myMessage.target.ftp);
+    
     client.get(myMessage.target.ftp, function(err, data) {
       if (err) {
         console.log('ftp error: ' + err);
