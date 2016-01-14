@@ -26,41 +26,45 @@ function downloadFile(myConfig, myMessage, callback) {
 	var client = new FTP();
 	console.log('message: ' + JSON.stringify(myMessage, null, 4));
 	client.on('ready', function() {
+    try {
+      client.get(myMessage.target.ftp, function(err, data) {
+        if (err) {
+          console.log('ftp error: ' + err);
+          callback();
+        	return;
+        }
 
-    client.get(myMessage.target.ftp, function(err, data) {
-      if (err) {
-        console.log('ftp error: ' + err);
-        callback();
-      	return;
-      }
-
-      var passThrough = new stream.PassThrough();
-      var s3ref = data.pipe(passThrough);
-			var s3obj = new AWS.S3({params: 
-        {Bucket: myConfig.Bucket, 
-          Key: myMessage.target.path} });
-			s3obj.upload({Body: s3ref})
-				/*.on('httpUploadProgress', function(evt) {
-			    	console.log('Progress:', evt); 
-			  	}) */
-			  	.send(function(err, data) { 
-            client.end();
-				  	console.log(err ? 'error: ' + err : 'data: ', data);
-            if (!err) {
-              var sortKey = config.maxdate.getTime() - (new Date()).getTime();
-              var rk = sortKey + '::' + myMessage.
-                target.ftp.
-                replace(/\/+/gi, '_').
-                replace(/\W+/gi, '-');
-              try {
-                tbl.write(myMessage.pathParams.clientid, rk, myMessage);
-              } catch(e) {
-                console.log('azure err: ' + e);
+        var passThrough = new stream.PassThrough();
+        var s3ref = data.pipe(passThrough);
+  			var s3obj = new AWS.S3({params: 
+          {Bucket: myConfig.Bucket, 
+            Key: myMessage.target.path} });
+  			s3obj.upload({Body: s3ref})
+  				/*.on('httpUploadProgress', function(evt) {
+  			    	console.log('Progress:', evt); 
+  			  	}) */
+  			  	.send(function(err, data) { 
+              client.end();
+  				  	console.log(err ? 'error: ' + err : 'data: ', data);
+              if (!err) {
+                var sortKey = config.maxdate.getTime() - (new Date()).getTime();
+                var rk = sortKey + '::' + myMessage.
+                  target.ftp.
+                  replace(/\/+/gi, '_').
+                  replace(/\W+/gi, '-');
+                try {
+                  tbl.write(myMessage.pathParams.clientid, rk, myMessage);
+                } catch(e) {
+                  console.log('azure err: ' + e);
+                }
               }
-            }
-				  	callback(err);
-				});
-		});
+  				  	callback(err);
+  				});
+  		});
+    } catch (ex) {
+      console.log('ftp error: ' + ex);
+      callback();
+    }
 	});
 
 	client.connect({
