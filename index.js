@@ -53,8 +53,7 @@ function downloadFile(myConfig, myMessage, callback) {
                 replace(/\/+/gi, '_').
                 replace(/\W+/gi, '-');
               try {
-                console.log(JSON.stringify(tbl, null, 4));
-                await tbl.write(myMessage.pathParams.clientid, rk, myMessage);
+                tbl.write(myMessage.pathParams.clientid, rk, myMessage);
               } catch(e) {
                 console.log('azure err: ' + e);
               }
