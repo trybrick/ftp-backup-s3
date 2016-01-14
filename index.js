@@ -25,21 +25,9 @@ config.maxdate = new Date(-8640000000000000);
 function downloadFile(myConfig, myMessage, callback) {
 	var client = new FTP();
 	console.log('message: ' + JSON.stringify(myMessage, null, 4));
-
-  client.on('error', function(err) {
-    console.log('ftp error: ' + JSON.stringify(err, null, 4));
-
-    if (err.code == 550) {
-      callback();
-    }
-    else {
-      callback(err);
-    }
-  });
-
 	client.on('ready', function() {
     console.log('getting file: ' + myMessage.target.ftp);
-    
+
     client.get(myMessage.target.ftp, function(err, data) {
       if (err) {
         console.log('ftp error: ' + err);
@@ -83,6 +71,7 @@ function downloadFile(myConfig, myMessage, callback) {
 	    secure: true
 	});
 }
+var currentCallback = null;
 
 var app = Consumer.create({
   queueUrl: config.QueueUrl,
@@ -90,6 +79,7 @@ var app = Consumer.create({
   handleMessage: function (message, done) {
   	config.lastActionTime = new Date();
   	config.isRunning = true;
+    currentCallback = done;
   	var msg = JSON.parse(message.Body);
   	var validActions = ['create', 'update'];
 
@@ -136,6 +126,15 @@ function handleIdle() {
 
 // idling timeout
 setTimeout(handleIdle, 999);
+
+process.on('uncaughtException', function(err) {
+  // handle the error safely
+  console.log('uncaught error: ' + err)
+  if (currentCallback) {
+    currentCallback();
+  }
+})
+
 app.start();
 
 // test download
