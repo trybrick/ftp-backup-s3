@@ -25,16 +25,18 @@ config.maxdate = new Date(-8640000000000000);
 function downloadFile(myConfig, myMessage, callback) {
 	var client = new FTP();
 	console.log('message: ' + JSON.stringify(myMessage, null, 4));
+
+  client.on('error', function(err) {
+    console.log('ftp error: ' + JSON.stringify(err, null, 4));
+    if (err.code == 550) {
+      callback();
+    }
+    else {
+      callback(err);
+    }
+  });
+
 	client.on('ready', function() {
-    client.on('error', function(err) {
-      if (err.code == 550) {
-        callback();
-      }
-      else {
-        callback(err);
-      }
-    });
-    
     client.get(myMessage.target.ftp, function(err, data) {
       if (err) {
         console.log('ftp error: ' + err);
