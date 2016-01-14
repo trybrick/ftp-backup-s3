@@ -6,7 +6,8 @@
     "sqs-consumer": "*",
     "aws-sdk": "*",
     "moment": "*",
-    "ftp": "*"
+    "ftp": "*",
+    "azure-storage-simple": "*"
   },
   "devDependencies": {
     "gulp-nop": "0.0.3"
