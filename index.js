@@ -8,10 +8,7 @@ var fs       = require('fs');
 var FTP      = require('ftp');
 var stream   = require('stream');
 var azStorageSimple = require('azure-storage-simple');
-
-var account = config.AzureAccount;
-var key = process.AzureKey;
-var azStorage = azStorageSimple(account, key);
+var azStorage = azStorageSimple(config.AzureAccount, config.AzureKey);
 
 AWS.config.update({
   region: config.Region,
