@@ -63,7 +63,15 @@ function downloadFile(myConfig, myMessage, callback) {
   		});
     } catch (ex) {
       console.log('ftp error: ' + ex);
-      callback();
+
+      // ignore file not found
+      var errMsg = ex + '';
+      if (errMsg.indexOf('No such file or directory') > 0) {
+        callback()
+      }
+      else {
+        callback(ex);
+      }
     }
 	});
 
