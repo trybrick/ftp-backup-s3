@@ -7,6 +7,11 @@ var path     = require('path');
 var fs       = require('fs');
 var FTP      = require('ftp');
 var stream   = require('stream');
+var azStorageSimple = require('azure-storage-simple');
+
+var account = config.AzureAccount;
+var key = process.AzureKey;
+var azStorage = azStorageSimple(account, key);
 
 AWS.config.update({
   region: config.Region,
@@ -17,6 +22,7 @@ AWS.config.update({
 config.startTime = new Date();
 config.isRunning = false;
 config.messageCount = 0;
+config.maxdate = new Date(-8640000000000000);
 
 function downloadFile(myConfig, myMessage, callback) {
 	var client = new FTP();
@@ -25,8 +31,9 @@ function downloadFile(myConfig, myMessage, callback) {
 
     client.get(myMessage.target.ftp, function(err, data) {
       if (err) {
-      	callback(err);
-      	throw err;
+        console.log('ftp error: ' + err);
+        callback();
+      	return;
       }
 
       var passThrough = new stream.PassThrough();
@@ -39,8 +46,21 @@ function downloadFile(myConfig, myMessage, callback) {
 			    	console.log('Progress:', evt); 
 			  	}) */
 			  	.send(function(err, data) { 
-				  	console.log(err ? 'error: ' + err : 'data: ', data);
             client.end();
+				  	console.log(err ? 'error: ' + err : 'data: ', data);
+            if (!err) {
+              var sortKey = config.maxdate.getTime() - (new Date()).getTime();
+              var rk = sortKey + '::' + myMessage.
+                target.ftp.
+                replace(/\/+/gi, '_').
+                replace(/\W+/gi, '-');
+              try {
+                var tbl = azStorage.table('brickftplog');
+                await tbl.write(myMessage.pathParams.clientid, rk, myMessage);
+              } catch(e) {
+                console.log('azure err: ' + e);
+              }
+            }
 				  	callback(err);
 				});
 		});
