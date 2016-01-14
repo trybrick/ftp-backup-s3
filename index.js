@@ -83,9 +83,8 @@ var app = Consumer.create({
   	var msg = JSON.parse(message.Body);
   	var validActions = ['create', 'update'];
 
-  	if ((validActions.indexOf(msg.queryParams.action) > -1)
-      && (msg.queryParams.type == "file")
-    ) {
+  	if (validActions.indexOf(msg.queryParams.action) > -1)
+    {
       config.messageCount++;
   		console.log(message);
   		downloadFile(config, msg, done);
