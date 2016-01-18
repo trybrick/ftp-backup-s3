@@ -47,6 +47,9 @@ function downloadFile(myConfig, myMessage, callback) {
             client.end();
 				  	console.log(err ? 'error: ' + err : 'data: ', data);
             if (!err) {
+              // valid to process for 7 days/1 week
+              params.Expires = 604800;
+              myMessage.target.download = s3.getSignedUrl('getObject', params);
               var sortKey = 8640000000000000 - (new Date()).getTime();
               var rk = sortKey + '::' + myMessage.
                 target.ftp.
