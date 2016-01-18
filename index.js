@@ -36,9 +36,8 @@ function downloadFile(myConfig, myMessage, callback) {
 
       var passThrough = new stream.PassThrough();
       var s3ref = data.pipe(passThrough);
-			var s3obj = new AWS.S3({params: 
-        {Bucket: myConfig.Bucket, 
-          Key: myMessage.target.path} });
+      var s3params = {params: {Bucket: myConfig.Bucket, Key: myMessage.target.path}};
+			var s3obj = new AWS.S3(s3params);
 			s3obj.upload({Body: s3ref})
 				/*.on('httpUploadProgress', function(evt) {
 			    	console.log('Progress:', evt); 
@@ -48,8 +47,8 @@ function downloadFile(myConfig, myMessage, callback) {
 				  	console.log(err ? 'error: ' + err : 'data: ', data);
             if (!err) {
               // valid to process for 7 days/1 week
-              params.Expires = 604800;
-              myMessage.target.download = s3.getSignedUrl('getObject', params);
+              s3params.Expires = 604800;
+              myMessage.target.download = s3.getSignedUrl('getObject', s3params);
               var sortKey = 8640000000000000 - (new Date()).getTime();
               var rk = sortKey + '::' + myMessage.
                 target.ftp.
