@@ -26,7 +26,6 @@ function handleMessage (msg, cb){
   if (validActions.indexOf(msg.queryParams.action) > -1)
   {
     config.messageCount++;
-    console.log(message);
     downloadFile(msg, cb);
     return;
   }
