@@ -81,7 +81,7 @@ function downloadFile(msg, callback) {
               console.log('azure err: ' + e);
             }
           }
-          
+
 			  	callback(err);
 			});
 		});
@@ -104,7 +104,7 @@ var app = Consumer.create({
   	config.isRunning = true;
     currentCallback = done;
   	var msg = JSON.parse(message.Body);
-  	handleMessage(done);
+  	handleMessage(msg, done);
   }
 });
  
