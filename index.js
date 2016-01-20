@@ -20,13 +20,27 @@ config.startTime = new Date();
 config.isRunning = false;
 config.messageCount = 0;
 
-function downloadFile(myConfig, myMessage, callback) {
-	var client = new FTP();
-	console.log('message: ' + JSON.stringify(myMessage, null, 4));
-	client.on('ready', function() {
-    console.log('getting file: ' + myMessage.target.ftp);
+function handleMessage (msg, cb){
+  var validActions = ['create', 'update'];
 
-    client.get(myMessage.target.ftp, function(err, data) {
+  if (validActions.indexOf(msg.queryParams.action) > -1)
+  {
+    config.messageCount++;
+    console.log(message);
+    downloadFile(msg, cb);
+    return;
+  }
+
+  cb();
+}
+
+function downloadFile(msg, callback) {
+	var client = new FTP();
+	console.log('message: ' + JSON.stringify(msg, null, 4));
+	client.on('ready', function() {
+    console.log('getting file: ' + msg.target.ftp);
+
+    client.get(msg.target.ftp, function(err, data) {
       if (err) {
         console.log('ftp error: ' + err);
         callback();
@@ -35,7 +49,7 @@ function downloadFile(myConfig, myMessage, callback) {
 
       var passThrough = new stream.PassThrough();
       var s3ref = data.pipe(passThrough);
-      var s3params = {params: {Bucket: myConfig.Bucket, Key: myMessage.target.path}};
+      var s3params = {params: {Bucket: config.Bucket, Key: msg.target.path}};
   		var s3obj = new AWS.S3(s3params);
       var progressEvt = {total: 0};
   		s3obj.upload({Body: s3ref})
@@ -50,32 +64,33 @@ function downloadFile(myConfig, myMessage, callback) {
             // valid to process for 7 days/1 week
             var s3obj2 = new AWS.S3(s3params);
             s3params.params.Expires = 604800;
-            myMessage.up = data;
-            myMessage.down = {
+            msg.up = data;
+            msg.down = {
               url: s3obj2.getSignedUrl('getObject', s3params.params),
               size: (progressEvt || {}).total
             };
 
             var sortKey = 8640000000000000 - (new Date()).getTime();
-            var rk = sortKey + '::' + myMessage.
+            var rk = sortKey + '::' + msg.
               target.ftp.
               replace(/\/+/gi, '_').
               replace(/\W+/gi, '-');
             try {
-              tbl.write(myMessage.pathParams.clientid, rk, myMessage);
+              tbl.write(msg.pathParams.clientid, rk, msg);
             } catch(e) {
               console.log('azure err: ' + e);
             }
           }
+          
 			  	callback(err);
 			});
 		});
 	});
 
 	client.connect({
-	    host: myConfig.FtpHost,
-	    user: myConfig.FtpUser,
-	    password: myConfig.FtpPass,
+	    host: config.FtpHost,
+	    user: config.FtpUser,
+	    password: config.FtpPass,
 	    secure: true
 	});
 }
@@ -89,17 +104,7 @@ var app = Consumer.create({
   	config.isRunning = true;
     currentCallback = done;
   	var msg = JSON.parse(message.Body);
-  	var validActions = ['create', 'update'];
-
-  	if (validActions.indexOf(msg.queryParams.action) > -1)
-    {
-      config.messageCount++;
-  		console.log(message);
-  		downloadFile(config, msg, done);
-  		return;
-  	}
-
-    done();
+  	handleMessage(done);
   }
 });
  
