@@ -23,13 +23,15 @@ config.messageCount = 0;
 function handleMessage (msg, cb){
   var validActions = ['create', 'update'];
 
+  console.log('message: ' + JSON.stringify(msg, null, 2));
   if (validActions.indexOf(msg.queryParams.action) > -1)
   {
     config.messageCount++;
-    console.log('message: ' + JSON.stringify(msg, null, 2));
+    console.log('processing...');
     downloadFile(msg, cb);
     return;
   }
+  console.log('ignoring...');
 
   cb();
 }
