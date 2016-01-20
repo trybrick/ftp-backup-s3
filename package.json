@@ -5,7 +5,6 @@
   "dependencies": {
     "sqs-consumer": "*",
     "aws-sdk": "*",
-    "moment": "*",
     "ftp": "*",
     "azure-storage-simple": "*",
     "Buffer": "*"

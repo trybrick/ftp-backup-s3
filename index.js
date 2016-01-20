@@ -2,7 +2,6 @@ var Consumer = require('sqs-consumer');
 var AWS      = require('aws-sdk');
 var config   = require('../../aws.json');
 var Client   = require('ftp');
-var moment   = require('moment');
 var path     = require('path');
 var fs       = require('fs');
 var FTP      = require('ftp');
@@ -37,32 +36,39 @@ function downloadFile(myConfig, myMessage, callback) {
       var passThrough = new stream.PassThrough();
       var s3ref = data.pipe(passThrough);
       var s3params = {params: {Bucket: myConfig.Bucket, Key: myMessage.target.path}};
-			var s3obj = new AWS.S3(s3params);
-			s3obj.upload({Body: s3ref})
-				/*.on('httpUploadProgress', function(evt) {
-			    	console.log('Progress:', evt); 
-			  	}) */
-			  	.send(function(err, data) { 
-            client.end();
-				  	console.log(err ? 'error: ' + err : 'data: ', data);
-            if (!err) {
-              // valid to process for 7 days/1 week
-              var s3obj2 = new AWS.S3(s3params);
-              s3params.params.Expires = 604800;
-              myMessage.target.download = s3obj2.getSignedUrl('getObject', s3params.params);
-              var sortKey = 8640000000000000 - (new Date()).getTime();
-              var rk = sortKey + '::' + myMessage.
-                target.ftp.
-                replace(/\/+/gi, '_').
-                replace(/\W+/gi, '-');
-              try {
-                tbl.write(myMessage.pathParams.clientid, rk, myMessage);
-              } catch(e) {
-                console.log('azure err: ' + e);
-              }
+  		var s3obj = new AWS.S3(s3params);
+      var progressEvt = {total: 0};
+  		s3obj.upload({Body: s3ref})
+			  .on('httpUploadProgress', function(evt) {
+		    	// console.log('Progress:', evt);
+          progressEvt = evt;
+		  	})
+		  	.send(function(err, data) { 
+          client.end();
+			  	console.log(err ? 'error: ' + err : 'data: ', data);
+          if (!err) {
+            // valid to process for 7 days/1 week
+            var s3obj2 = new AWS.S3(s3params);
+            s3params.params.Expires = 604800;
+            myMessage.up = data;
+            myMessage.down = {
+              url: s3obj2.getSignedUrl('getObject', s3params.params),
+              size: (progressEvt || {}).total
+            };
+
+            var sortKey = 8640000000000000 - (new Date()).getTime();
+            var rk = sortKey + '::' + myMessage.
+              target.ftp.
+              replace(/\/+/gi, '_').
+              replace(/\W+/gi, '-');
+            try {
+              tbl.write(myMessage.pathParams.clientid, rk, myMessage);
+            } catch(e) {
+              console.log('azure err: ' + e);
             }
-				  	callback(err);
-				});
+          }
+			  	callback(err);
+			});
 		});
 	});
 
