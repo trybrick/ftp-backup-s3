@@ -26,6 +26,7 @@ function handleMessage (msg, cb){
   if (validActions.indexOf(msg.queryParams.action) > -1)
   {
     config.messageCount++;
+    console.log('message: ' + JSON.stringify(msg, null, 2));
     downloadFile(msg, cb);
     return;
   }
@@ -35,7 +36,6 @@ function handleMessage (msg, cb){
 
 function downloadFile(msg, callback) {
 	var client = new FTP();
-	console.log('message: ' + JSON.stringify(msg, null, 4));
 	client.on('ready', function() {
     console.log('getting file: ' + msg.target.ftp);
 
@@ -120,8 +120,8 @@ var idleLimit = (config.IdleTime||15)*1000;
 
 function handleIdle() {
 	var currentTime = new Date();
-    var diffMs = (currentTime - (config.lastActionTime || config.startTime));
-    console.log(diffMs);
+  var diffMs = (currentTime - (config.lastActionTime || config.startTime));
+  console.log(diffMs);
 
 	if (!config.isRunning && diffMs > idleLimit)
 	{
