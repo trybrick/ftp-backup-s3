@@ -70,6 +70,7 @@ function downloadFile(msg, callback) {
               url: s3obj2.getSignedUrl('getObject', s3params.params),
               size: (progressEvt || {}).total
             };
+            msg.down.jpg = 'http://noogen.net/lib/pdftojpg.php?url=' + encodeURIComponent(msg.down.url);
 
             var sortKey = 8640000000000000 - (new Date()).getTime();
             var rk = sortKey + '::' + msg.
