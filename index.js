@@ -62,9 +62,9 @@ function downloadFile(msg, callback) {
           client.end();
 			  	console.log(err ? 'error: ' + err : 'data: ', data);
           if (!err) {
-            // valid to process for 7 days/1 week
+            // valid to process for 14 days in seconds
             var s3obj2 = new AWS.S3(s3params);
-            s3params.params.Expires = 604800;
+            s3params.params.Expires = 1209600;
             msg.up = data;
             msg.down = {
               url: s3obj2.getSignedUrl('getObject', s3params.params),
