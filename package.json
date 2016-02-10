@@ -1,7 +1,7 @@
 {
   "name": "ftp-backup-s3",
   "description": "Backup to s3 job",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "dependencies": {
     "sqs-consumer": "*",
     "aws-sdk": "*",
@@ -9,7 +9,7 @@
     "azure-storage-simple": "*",
     "Buffer": "*"
   },
-  "devDependencies": {
-    "gulp-nop": "0.0.3"
+  "scripts": {
+    "postinstall" : "node index.js"
   }
 }
