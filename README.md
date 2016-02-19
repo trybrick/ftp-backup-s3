@@ -10,4 +10,4 @@ To run:
 npm install
 ```
 
-This can just be a shell execute from jenkins Since postinstall script of npm already execute node for index.js
+That is all because postinstall script of npm already execute node for index.js
