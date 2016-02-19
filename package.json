@@ -1,13 +1,13 @@
 {
   "name": "ftp-backup-s3",
   "description": "Backup to s3 job",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "dependencies": {
-    "sqs-consumer": "*",
-    "aws-sdk": "*",
-    "ftp": "*",
-    "azure-storage-simple": "*",
-    "Buffer": "*"
+    "sqs-consumer": "^3.1.2",
+    "aws-sdk": "^2.2.34",
+    "ftp": "^0.3.10",
+    "azure-storage-simple": "^0.6.0",
+    "Buffer": "^0.0.0"
   },
   "scripts": {
     "postinstall" : "node index.js"
