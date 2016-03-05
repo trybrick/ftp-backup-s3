@@ -75,7 +75,7 @@ function downloadFile(msg, callback) {
         total: 0
       };
       var today = moment(new Date());
-      var sortKey = today.utc().format();
+      var sortKey = 8640000000000000 - (new Date()).getTime();
       var ftpSlug = msg.target.ftp.replace(/\/+/gi, '_').replace(/\W+/gi, '-');
       var rk = `${sortKey}::${ftpSlug}`;
 
