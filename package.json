@@ -3,13 +3,14 @@
   "description": "Backup to s3 job",
   "version": "1.0.2",
   "dependencies": {
-    "sqs-consumer": "^3.1.2",
+    "Buffer": "^0.0.0",
     "aws-sdk": "^2.2.34",
-    "ftp": "^0.3.10",
     "azure-storage-simple": "^0.6.0",
-    "Buffer": "^0.0.0"
+    "ftp": "^0.3.10",
+    "moment": "^2.11.2",
+    "sqs-consumer": "^3.1.2"
   },
   "scripts": {
-    "postinstall" : "node index.js"
+    "postinstall": "node index.js"
   }
 }

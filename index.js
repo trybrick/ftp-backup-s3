@@ -7,6 +7,7 @@ var fs = require('fs');
 var FTP = require('ftp');
 var stream = require('stream');
 var azStorageSimple = require('azure-storage-simple');
+var moment = require('moment');
 
 var ftpConfig = config.FTP_CONNECTION_STRING.split('@');
 var ftpAccount = ftpConfig[0].split(':');
@@ -73,13 +74,21 @@ function downloadFile(msg, callback) {
       var progressEvt = {
         total: 0
       };
+      var today = moment(new Date());
+      var sortKey = today.utc().format();
+      var ftpSlug = msg.target.ftp.replace(/\/+/gi, '_').replace(/\W+/gi, '-');
+      var rk = `${sortKey}::${ftpSlug}`;
+
       s3obj.upload({
-        Body: s3ref
+        Body: s3ref,
+        Metadata: {
+          ftp: msg.target.ftp,
+          azure: ftpSlug
+        }
+      }).on('httpUploadProgress', function(evt) {
+        // console.log('Progress:', evt);
+        progressEvt = evt;
       })
-        .on('httpUploadProgress', function(evt) {
-          // console.log('Progress:', evt);
-          progressEvt = evt;
-        })
         .send(function(err, data) {
           client.end();
           console.log(err ? 'error: ' + err : 'data: ', data);
@@ -97,11 +106,6 @@ function downloadFile(msg, callback) {
               msg.jpg = 'http://noogen.net/lib/pdftojpg.php?url=' + encodeURIComponent(msg.down.url);
             }
 
-            var sortKey = 8640000000000000 - (new Date()).getTime();
-            var rk = sortKey + '::' + msg.
-                target.ftp.
-                replace(/\/+/gi, '_').
-                replace(/\W+/gi, '-');
             try {
               tbl.write(msg.pathParams.clientid, rk, msg);
             } catch (e) {
