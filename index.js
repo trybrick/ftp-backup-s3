@@ -80,11 +80,7 @@ function downloadFile(msg, callback) {
       var rk = `${sortKey}::${ftpSlug}`;
 
       s3obj.upload({
-        Body: s3ref,
-        Metadata: {
-          ftp: msg.target.ftp,
-          azure: ftpSlug
-        }
+        Body: s3ref
       }).on('httpUploadProgress', function(evt) {
         // console.log('Progress:', evt);
         progressEvt = evt;
