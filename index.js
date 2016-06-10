@@ -8,6 +8,7 @@ var FTP = require('ftp');
 var stream = require('stream');
 var azStorageSimple = require('azure-storage-simple');
 var moment = require('moment');
+var mimetype = require('mimetype');
 
 var ftpConfig = config.FTP_CONNECTION_STRING.split('@');
 var ftpAccount = ftpConfig[0].split(':');
@@ -61,6 +62,7 @@ function downloadFile(msg, callback) {
         return;
       }
 
+      var fileName = path.basename(msg.target.path);
       var passThrough = new stream.PassThrough();
       var s3ref = data.pipe(passThrough);
       var s3params = {
@@ -80,7 +82,8 @@ function downloadFile(msg, callback) {
       var rk = `${sortKey}::${ftpSlug}`;
 
       s3obj.upload({
-        Body: s3ref
+        Body: s3ref,
+        ContentType: mimetype.lookup(fileName) || 'application/octet-stream'
       }).on('httpUploadProgress', function(evt) {
         // console.log('Progress:', evt);
         progressEvt = evt;

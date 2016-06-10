@@ -12,5 +12,8 @@
   },
   "scripts": {
     "postinstall": "node index.js"
+  },
+  "devDependencies": {
+    "mimetype": "0.0.8"
   }
 }
