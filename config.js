@@ -13,5 +13,24 @@ module.exports = {
   "IsTest": env.NODE_ENV === 'development',
   "Bucket": 'brick-ftp',
   "QueueUrl": "https://sqs.us-west-2.amazonaws.com/697537225083/BrickFtpBackupQueue",
-  "IdleTime": 60
+  "IdleTime": 60,
+  "getMeta": function(clientId, srcData) {
+  	var folderIdx = srcData.Key.indexOf('creative-assets');
+  	var newKey = '';
+  	if (folderIdx > 0) {
+  	  var newKey = srcData.Key.substr(folderIdx);
+  	}
+  	var chainId = clientId + '';
+
+  	if (chainId == '129' && newKey.length !== srcData.Key.length) {
+  		return {
+  			Metadata: {
+  				TargetBucket: 'coborns',
+  				TargetKey: newKey
+  			}
+  		}
+  	}
+
+  	return { Metadata: {} };
+  }
 };

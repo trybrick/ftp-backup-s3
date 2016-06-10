@@ -80,10 +80,12 @@ function downloadFile(msg, callback) {
       var sortKey = 8640000000000000 - (new Date()).getTime();
       var ftpSlug = msg.target.ftp.replace(/\/+/gi, '_').replace(/\W+/gi, '-');
       var rk = `${sortKey}::${ftpSlug}`;
+      var meta = config.getMeta(msg.pathParams.clientid, s3params.params);
 
       s3obj.upload({
         Body: s3ref,
-        ContentType: mimetype.lookup(fileName) || 'application/octet-stream'
+        ContentType: mimetype.lookup(fileName) || 'application/octet-stream',
+        Metadata: meta.Metadata
       }).on('httpUploadProgress', function(evt) {
         // console.log('Progress:', evt);
         progressEvt = evt;
