@@ -8,12 +8,10 @@
     "azure-storage-simple": "^0.6.0",
     "ftp": "^0.3.10",
     "moment": "^2.11.2",
-    "sqs-consumer": "^3.1.2"
+    "sqs-consumer": "^3.1.2",
+    "mimetype": "0.0.8"
   },
   "scripts": {
     "postinstall": "node index.js"
-  },
-  "devDependencies": {
-    "mimetype": "0.0.8"
   }
 }
