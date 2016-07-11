@@ -102,7 +102,7 @@ function downloadFile(msg, callback) {
             };
 
             if (/\.pdf+/gi.test(msg.down.url)) {
-              msg.jpg = 'http://noogen.net/lib/pdftojpg.php?url=' + encodeURIComponent(msg.down.url);
+              msg.jpg = 'https://ue99nkfmi9.execute-api.us-west-2.amazonaws.com/prod/pdf/extract?url=' + encodeURIComponent(msg.down.url);
             }
 
             try {
